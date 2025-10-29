@@ -17,18 +17,18 @@ echo "npm 版本: $npm_version"
 
 # 检查依赖是否安装
 if [ ! -d "node_modules" ]; then
-    echo "📦 未发现 node_modules，正在安装依赖..."
-    npm install
+  echo "📦 未发现 node_modules，正在安装依赖..."
+  npm install
 else
-    echo "✅ 依赖已安装"
+  echo "✅ 依赖已安装"
 fi
 
 # 检查 react-scripts 是否存在
 if [ ! -f "node_modules/.bin/react-scripts" ]; then
-    echo "❌ react-scripts 未找到，正在重新安装..."
-    npm install react-scripts@5.0.1
+  echo "❌ react-scripts 未找到，正在重新安装..."
+  npm install react-scripts@5.0.1
 else
-    echo "✅ react-scripts 已安装"
+  echo "✅ react-scripts 已安装"
 fi
 
 # 设置环境变量

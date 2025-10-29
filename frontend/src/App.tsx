@@ -1,25 +1,35 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ConfigProvider } from 'antd';
+import zhCN from 'antd/locale/zh_CN';
+import { AppProvider } from './contexts/AppContext';
+import MainLayout from './components/layout/MainLayout';
+import HomePage from './pages/home/HomePage';
+import GeneratorPage from './pages/generator/GeneratorPage';
+import TemplatesPage from './pages/templates/TemplatesPage';
+import ConfigPage from './pages/config/ConfigPage';
+import { antdTheme } from './styles/theme';
+import './styles/global.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ConfigProvider 
+      locale={zhCN}
+      theme={antdTheme}
+    >
+      <AppProvider>
+        <Router>
+          <MainLayout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/generator" element={<GeneratorPage />} />
+              <Route path="/templates" element={<TemplatesPage />} />
+              <Route path="/config" element={<ConfigPage />} />
+            </Routes>
+          </MainLayout>
+        </Router>
+      </AppProvider>
+    </ConfigProvider>
   );
 }
 
