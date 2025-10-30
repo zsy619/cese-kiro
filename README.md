@@ -18,6 +18,15 @@
 
 **上下文工程六要素小工具 (Context Engineering Six Elements)** 是一个帮助用户构建高质量 AI 提示词的工具。基于上下文工程理论，本工具通过六个核心要素的结构化输入，自动生成专业、精准的提示词模板。
 
+### 🎯 当前状态
+
+- ✅ **前端开发**：MVP 阶段 100% 完成
+- ⏳ **后端开发**：待开始
+- ⏳ **数据库设计**：待开始
+- ⏳ **AI 集成**：待开始
+
+详细进度请查看 [项目进度报告](PROJECT_STATUS.md)
+
 ### 核心功能
 
 - **🎯 六要素结构化输入**：基于任务目标、角色定义、关键信息、行为规则、交付格式和示例参考六大要素，引导用户系统化构建提示词
@@ -39,6 +48,7 @@
 ## 🚀 技术栈
 
 ### 前端
+
 - **React 18+**：现代化的前端框架
 - **TypeScript**：类型安全的开发体验
 - **Ant Design / Material-UI**：优雅的 UI 组件库
@@ -47,6 +57,7 @@
 - **Monaco Editor**：代码编辑器（用于 Markdown 编辑）
 
 ### 后端
+
 - **Hertz**：字节跳动开源的高性能 Go HTTP 框架
 - **Go 1.20+**：高效的后端语言
 - **GORM**：Go ORM 库
@@ -54,9 +65,11 @@
 - **Swagger**：API 文档
 
 ### 数据库
+
 - **MySQL 8.0+**：关系型数据库
 
 ### AI 集成
+
 - **Ollama**：本地大模型运行环境
 - **DeepSeek**：高性能开源大模型
 
@@ -65,18 +78,21 @@
 ### 方式一：源码启动（推荐开发使用）
 
 #### 前置要求
-- Node.js 18+ 
+
+- Node.js 18+
 - Go 1.20+
 - MySQL 8.0+
 - Ollama（可选，用于 AI 功能）
 
 #### 1. 克隆项目
+
 ```bash
 git clone https://github.com/zsy619/cese-kiro.git
 cd cese-kiro
 ```
 
 #### 2. 配置数据库
+
 ```bash
 # 登录 MySQL
 mysql -u root -p
@@ -89,6 +105,7 @@ exit
 ```
 
 #### 3. 启动后端服务
+
 ```bash
 cd backend
 
@@ -111,6 +128,7 @@ go run cmd/server/main.go
 后端服务将在 `http://localhost:8080` 启动
 
 #### 4. 启动前端服务
+
 ```bash
 # 新开一个终端
 cd frontend
@@ -129,6 +147,7 @@ yarn dev
 前端服务将在 `http://localhost:3000` 启动
 
 #### 5. 配置 Ollama（可选）
+
 ```bash
 # 安装 Ollama
 curl -fsSL https://ollama.com/install.sh | sh
@@ -143,16 +162,19 @@ ollama serve
 ### 方式二：Docker 启动（推荐生产使用）
 
 #### 前置要求
+
 - Docker 20+
 - Docker Compose 2+
 
 #### 1. 克隆项目
+
 ```bash
 git clone https://github.com/zsy619/cese-kiro.git
 cd cese-kiro
 ```
 
 #### 2. 配置环境变量
+
 ```bash
 # 复制环境变量文件
 cp .env.example .env
@@ -162,6 +184,7 @@ cp .env.example .env
 ```
 
 #### 3. 启动所有服务
+
 ```bash
 # 构建并启动
 docker-compose up -d
@@ -174,11 +197,13 @@ docker-compose down
 ```
 
 服务访问地址：
+
 - 前端：`http://localhost:3000`
 - 后端 API：`http://localhost:8080`
 - API 文档：`http://localhost:8080/swagger`
 
 #### 4. 启动 Ollama（可选）
+
 ```bash
 # 使用 Docker 运行 Ollama
 docker run -d --name ollama \
@@ -195,11 +220,13 @@ docker exec -it ollama ollama pull deepseek-coder
 #### 部署到阿里云函数计算
 
 ##### 1. 安装 Serverless Devs
+
 ```bash
 npm install -g @serverless-devs/s
 ```
 
 ##### 2. 配置阿里云账号
+
 ```bash
 s config add
 
@@ -207,6 +234,7 @@ s config add
 ```
 
 ##### 3. 部署后端
+
 ```bash
 cd backend
 
@@ -218,6 +246,7 @@ s deploy
 ```
 
 ##### 4. 部署前端到 OSS
+
 ```bash
 cd frontend
 
@@ -231,16 +260,19 @@ s deploy
 #### 部署到腾讯云 SCF
 
 ##### 1. 安装 Serverless Framework
+
 ```bash
 npm install -g serverless
 ```
 
 ##### 2. 配置腾讯云账号
+
 ```bash
 serverless login
 ```
 
 ##### 3. 部署
+
 ```bash
 # 部署后端
 cd backend
@@ -255,6 +287,7 @@ serverless deploy
 #### 部署到 AWS Lambda
 
 ##### 1. 安装 AWS CLI 和 SAM CLI
+
 ```bash
 # macOS
 brew install aws-cli aws-sam-cli
@@ -264,6 +297,7 @@ aws configure
 ```
 
 ##### 2. 部署
+
 ```bash
 # 构建
 sam build
@@ -369,11 +403,29 @@ VITE_OLLAMA_ENABLED=true
 
 欢迎贡献代码、报告问题或提出建议！
 
+### 代码规范
+
+在提交代码前，请确保：
+
+- ✅ 所有注释使用中文
+- ✅ 变量和函数名使用英文
+- ✅ 使用 4 个空格缩进
+- ✅ 遵循命名规范（PascalCase, camelCase, UPPER_SNAKE_CASE）
+- ✅ 通过代码检查：`npm run check`
+
+详细规范请查看：
+
+- [完整代码规范](docs/CODE_STANDARDS.md)
+- [快速参考指南](docs/CODE_STYLE_GUIDE.md)
+
+### 提交流程
+
 1. Fork 本仓库
 2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
+3. 提交更改 (`git commit -m 'feat: 添加某某功能'`)
+4. 运行代码检查 (`npm run check`)
+5. 推送到分支 (`git push origin feature/AmazingFeature`)
+6. 开启 Pull Request
 
 ## 📄 开源协议
 

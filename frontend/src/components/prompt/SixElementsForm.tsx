@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Card, Typography, Space, Button, Tooltip, Row, Col, Collapse } from 'antd';
+import { Form, Input, Card, Typography, Space, Button, Tooltip, Row, Col, Collapse, message } from 'antd';
 import { 
   InfoCircleOutlined, 
   RocketOutlined, 
@@ -8,11 +8,14 @@ import {
   FileTextOutlined,
   HeartOutlined,
   CloudDownloadOutlined,
-  SettingOutlined
+  SettingOutlined,
+  SaveOutlined,
+  HistoryOutlined
 } from '@ant-design/icons';
 import { SixElements } from '../../types';
 import RoleSuggestions from './RoleSuggestions';
 import FormatTemplates from './FormatTemplates';
+import { useFormAutoSave, useUserPreferences } from '../../hooks';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -33,6 +36,21 @@ const SixElementsForm: React.FC<SixElementsFormProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState<Partial<SixElements>>(initialValues || {});
+  const [preferences] = useUserPreferences();
+  
+  // 自动保存功能
+  const { hasUnsavedChanges, manualSave, restoreFromStorage, clearStorage } = useFormAutoSave(
+    formValues,
+    {
+      storageKey: 'six_elements_form_draft',
+      enabled: preferences.autoSave,
+      delay: 3000,
+      showSuccessMessage: false, // 不显示自动保存成功消息，避免干扰用户
+      onError: (error) => {
+        console.error('自动保存失败:', error);
+      }
+    }
+  );
 
   // 六要素配置
   const elementsConfig = [
@@ -114,10 +132,51 @@ const SixElementsForm: React.FC<SixElementsFormProps> = ({
     }
   ];
 
+  // 恢复草稿数据
+  const handleRestoreDraft = () => {
+    const draftData = restoreFromStorage();
+    if (draftData) {
+      form.setFieldsValue(draftData);
+      setFormValues(draftData);
+      onChange?.(draftData as SixElements);
+      message.success('已恢复草稿数据');
+    }
+  };
+
+  // 清除草稿数据
+  const handleClearDraft = () => {
+    clearStorage();
+    message.success('已清除草稿数据');
+  };
+
+  // 手动保存草稿
+  const handleSaveDraft = () => {
+    manualSave();
+    message.success('草稿已保存');
+  };
+
   useEffect(() => {
     if (initialValues) {
       form.setFieldsValue(initialValues);
       setFormValues(initialValues);
+    } else {
+      // 检查是否有草稿数据
+      const draftData = restoreFromStorage();
+      if (draftData && Object.keys(draftData).length > 0) {
+        // 询问用户是否恢复草稿
+        const hasContent = Object.values(draftData).some(value => value && value.toString().trim());
+        if (hasContent) {
+          message.info(
+            <div>
+              发现未保存的草稿数据，
+              <Button type="link" size="small" onClick={handleRestoreDraft}>
+                点击恢复
+              </Button>
+            </div>,
+            10 // 显示10秒
+          );
+        }
+      }
     }
   }, [initialValues, form]);
 
@@ -236,25 +295,58 @@ const SixElementsForm: React.FC<SixElementsFormProps> = ({
           ))}
         </Row>
 
-        <div className='mt-8 text-center'>
-          <Space size='large'>
-            <Button 
-              type='default' 
-              size='large'
-              onClick={() => form.resetFields()}
-            >
-              重置表单
-            </Button>
-            <Button 
-              type='primary' 
-              size='large'
-              htmlType='submit'
-              loading={loading}
-              className='px-8'
-            >
-              生成提示词
-            </Button>
-          </Space>
+        <div className='mt-8'>
+          {/* 自动保存状态提示 */}
+          {preferences.autoSave && (
+            <div className='flex items-center justify-center mb-4 text-sm text-gray-500'>
+              <SaveOutlined className='mr-1' />
+              {hasUnsavedChanges ? '有未保存的更改，将自动保存...' : '所有更改已自动保存'}
+            </div>
+          )}
+          
+          <div className='text-center'>
+            <Space size='large' wrap>
+              <Button 
+                type='default' 
+                size='large'
+                onClick={() => {
+                  form.resetFields();
+                  setFormValues({});
+                  clearStorage();
+                }}
+              >
+                重置表单
+              </Button>
+              
+              {!preferences.autoSave && (
+                <Button 
+                  icon={<SaveOutlined />}
+                  size='large'
+                  onClick={handleSaveDraft}
+                >
+                  保存草稿
+                </Button>
+              )}
+              
+              <Button 
+                icon={<HistoryOutlined />}
+                size='large'
+                onClick={handleRestoreDraft}
+              >
+                恢复草稿
+              </Button>
+              
+              <Button 
+                type='primary' 
+                size='large'
+                htmlType='submit'
+                loading={loading}
+                className='px-8'
+              >
+                生成提示词
+              </Button>
+            </Space>
+          </div>
         </div>
       </Form>
     </div>

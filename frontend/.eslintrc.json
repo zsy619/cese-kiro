@@ -1,0 +1,46 @@
+{
+    "extends": [
+        "react-app",
+        "react-app/jest",
+        "prettier"
+    ],
+    "rules": {
+        "no-console": [
+            "warn",
+            {
+                "allow": [
+                    "warn",
+                    "error"
+                ]
+            }
+        ],
+        "no-debugger": "warn",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": [
+            "warn",
+            {
+                "argsIgnorePattern": "^_",
+                "varsIgnorePattern": "^_"
+            }
+        ],
+        "react/prop-types": "off",
+        "react/react-in-jsx-scope": "off",
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn"
+    },
+    "overrides": [
+        {
+            "files": [
+                "**/__tests__/**/*",
+                "**/*.test.*",
+                "**/*.spec.*"
+            ],
+            "env": {
+                "jest": true
+            },
+            "rules": {
+                "no-console": "off"
+            }
+        }
+    ]
+}

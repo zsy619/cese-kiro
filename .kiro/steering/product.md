@@ -1,25 +1,25 @@
-# Product Overview
+# 产品概述
 
-## Context Engineering Six Elements (CESE) Tool
+## 上下文工程六要素（CESE）工具
 
-An intelligent prompt generation tool that helps users build high-quality AI prompts using a structured approach based on six core elements:
+一个智能提示词生成工具，帮助用户使用基于六个核心要素的结构化方法构建高质量的 AI 提示词：
 
-1. **Task Goal** - Define specific objectives
-2. **AI Role** - Set AI's professional identity  
-3. **User Role** - Describe user's position
-4. **Key Information** - Provide essential context
-5. **Behavior Rules** - Establish guidelines
-6. **Delivery Format** - Specify output structure
+1. **任务目标** - 定义具体目标
+2. **AI的角色** - 设定 AI 的专业身份
+3. **我的角色** - 描述用户的定位
+4. **关键信息** - 提供必要的上下文
+5. **行为规则** - 建立指导原则
+6. **交付格式** - 指定输出结构
 
-## Core Features
+## 核心功能
 
-- Six-element structured prompt input system
-- Theme management for saving and organizing prompts
-- Local AI integration with Ollama + DeepSeek
-- Markdown template import/export
-- History tracking and version management
-- Multi-deployment options (source, Docker, serverless)
+- 六要素结构化提示词输入系统
+- 主题管理，用于保存和组织提示词
+- 本地 AI 集成（Ollama + DeepSeek）
+- Markdown 模板导入/导出
+- 历史记录跟踪和版本管理
+- 多种部署选项（源码、Docker、无服务器）
 
-## Target Users
+## 目标用户
 
-Developers, content creators, and AI practitioners who need to create consistent, high-quality prompts for various AI applications.
+需要为各种 AI 应用创建一致、高质量提示词的开发者、内容创作者和 AI 从业者。

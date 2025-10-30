@@ -1,2 +1,53 @@
 {
+    // 编辑器配置
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
+    // 文件编码
+    "files.encoding": "utf8",
+    "files.eol": "\n",
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    // TypeScript 配置
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    // ESLint 配置
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ],
+    // Prettier 配置
+    "prettier.tabWidth": 4,
+    "prettier.useTabs": false,
+    "prettier.singleQuote": true,
+    "prettier.semi": true,
+    "prettier.trailingComma": "none",
+    // 文件关联
+    "files.associations": {
+        "*.tsx": "typescriptreact",
+        "*.ts": "typescript",
+        "*.jsx": "javascriptreact",
+        "*.js": "javascript"
+    },
+    // 排除文件
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/build": true
+    },
+    // 搜索排除
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/build": true,
+        "**/.git": true
+    }
 }
