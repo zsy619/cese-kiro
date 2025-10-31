@@ -1,0 +1,121 @@
+# CESE 后端服务测试环境配置
+
+# 服务配置
+server:
+  host: "localhost"
+  port: 8081
+  mode: "debug" # 测试环境使用debug模式
+
+# 数据库配置
+database:
+  host: "localhost"
+  port: 3306
+  username: "root"
+  password: "123456"
+  database: "cese_test"
+  charset: "utf8mb4"
+  parse_time: true
+  loc: "Local"
+  max_idle_conns: 5
+  max_open_conns: 20
+  conn_max_lifetime: 1800 # 30分钟
+
+# JWT配置
+jwt:
+  secret: "test-jwt-secret-key-for-testing-only"
+  expire_hours: 1 # 测试环境Token过期时间短一些
+  refresh_expire_hours: 24 # 刷新Token过期时间（1天）
+
+# 日志配置
+log:
+  level: "debug" # 测试环境使用debug级别
+  format: "text" # 文本格式便于阅读
+  output: "stdout" # 输出到控制台
+  file_path: "logs/test.log"
+  max_size: 50 # MB
+  max_backups: 3
+  max_age: 7 # 天
+  compress: false
+
+# 分页配置
+pagination:
+  default_page: 1
+  default_size: 10 # 测试环境使用较小的分页大小
+  max_size: 50
+
+# 密码配置
+password:
+  min_length: 6 # 测试环境密码要求较低
+  max_length: 16
+  require_number: true
+  require_lower: true
+  require_upper: false # 测试环境不强制要求大写字母
+  require_special: false # 测试环境不强制要求特殊字符
+
+# Redis配置（可选，测试环境可能不需要）
+redis:
+  host: "localhost"
+  port: 6379
+  password: ""
+  database: 1 # 使用不同的数据库
+  pool_size: 5
+  min_idle_conns: 1
+
+# 限流配置（测试环境较宽松）
+rate_limit:
+  enabled: false # 测试环境可以禁用限流
+  global:
+    requests: 10000
+    window: "1m"
+  apis:
+    "/api/v1/user/login":
+      requests: 100
+      window: "1m"
+    "/api/v1/user/register":
+      requests: 50
+      window: "1h"
+    "default":
+      requests: 1000
+      window: "1m"
+
+# 安全配置
+security:
+  cors:
+    allowed_origins: ["*"] # 测试环境允许所有来源
+    allowed_methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allowed_headers: ["*"]
+    max_age: 86400
+  max_request_size: "50MB" # 测试环境允许更大的请求
+  read_timeout: "60s"
+  write_timeout: "60s"
+  idle_timeout: "300s"
+
+# 监控配置
+monitoring:
+  health_check:
+    enabled: true
+    path: "/health"
+  metrics:
+    enabled: false # 测试环境可以禁用指标收集
+    path: "/metrics"
+  tracing:
+    enabled: false # 测试环境可以禁用链路追踪
+
+# 邮件配置（测试环境使用模拟）
+email:
+  smtp_host: "localhost"
+  smtp_port: 1025 # MailHog端口
+  username: ""
+  password: ""
+  from: "test@example.com"
+
+# 测试专用配置
+test:
+  # 数据库自动清理
+  auto_cleanup: true
+  # 测试数据种子
+  seed_data: true
+  # 并发测试配置
+  concurrency:
+    max_workers: 10
+    request_timeout: "30s"

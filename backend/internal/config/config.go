@@ -15,6 +15,8 @@ type Config struct {
 	Log        LogConfig        `mapstructure:"log"`
 	Pagination PaginationConfig `mapstructure:"pagination"`
 	Password   PasswordConfig   `mapstructure:"password"`
+	RateLimit  RateLimitConfig  `mapstructure:"rate_limit"`
+	Security   SecurityConfig   `mapstructure:"security"`
 }
 
 // ServerConfig 服务器配置
@@ -41,8 +43,9 @@ type DatabaseConfig struct {
 
 // JWTConfig JWT配置
 type JWTConfig struct {
-	Secret      string `mapstructure:"secret"`
-	ExpireHours int    `mapstructure:"expire_hours"`
+	Secret             string `mapstructure:"secret"`
+	ExpireHours        int    `mapstructure:"expire_hours"`
+	RefreshExpireHours int    `mapstructure:"refresh_expire_hours"`
 }
 
 // LogConfig 日志配置
@@ -147,4 +150,39 @@ func (c *Config) GetDSN() string {
 // GetJWTExpireDuration 获取JWT过期时间
 func (c *Config) GetJWTExpireDuration() time.Duration {
 	return time.Duration(c.JWT.ExpireHours) * time.Hour
+}
+
+// RateLimitConfig 限流配置
+type RateLimitConfig struct {
+	Enabled bool                     `mapstructure:"enabled"`
+	Global  RateLimitRule            `mapstructure:"global"`
+	APIs    map[string]RateLimitRule `mapstructure:"apis"`
+}
+
+// RateLimitRule 限流规则
+type RateLimitRule struct {
+	Requests int    `mapstructure:"requests"`
+	Window   string `mapstructure:"window"`
+}
+
+// SecurityConfig 安全配置
+type SecurityConfig struct {
+	CORS           CORSConfig `mapstructure:"cors"`
+	MaxRequestSize string     `mapstructure:"max_request_size"`
+	ReadTimeout    string     `mapstructure:"read_timeout"`
+	WriteTimeout   string     `mapstructure:"write_timeout"`
+	IdleTimeout    string     `mapstructure:"idle_timeout"`
+}
+
+// CORSConfig CORS配置
+type CORSConfig struct {
+	AllowedOrigins []string `mapstructure:"allowed_origins"`
+	AllowedMethods []string `mapstructure:"allowed_methods"`
+	AllowedHeaders []string `mapstructure:"allowed_headers"`
+	MaxAge         int      `mapstructure:"max_age"`
+}
+
+// GetRefreshExpireDuration 获取刷新Token过期时间
+func (c *Config) GetRefreshExpireDuration() time.Duration {
+	return time.Duration(c.JWT.RefreshExpireHours) * time.Hour
 }

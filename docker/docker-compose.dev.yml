@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库 - 开发环境
+  mysql:
+    image: mysql:8.0
+    container_name: cese-mysql-dev
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: cese_dev
+      MYSQL_USER: cese_user
+      MYSQL_PASSWORD: cese_password
+    ports:
+      - "3307:3306"  # 避免与本地MySQL冲突
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - cese-network-dev
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Redis 缓存 - 开发环境
+  redis:
+    image: redis:7-alpine
+    container_name: cese-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6380:6379"  # 避免与本地Redis冲突
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - cese-network-dev
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 10s
+      retries: 5
+
+  # 前端开发服务
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../docker/Dockerfile.frontend.dev
+    container_name: cese-frontend-dev
+    restart: unless-stopped
+    ports:
+      - "3100:3000"
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_BASE_URL=http://localhost:8081/api
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ../frontend/src:/app/src
+      - ../frontend/public:/app/public
+      - /app/node_modules
+    networks:
+      - cese-network-dev
+
+  # 后端开发服务
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../docker/Dockerfile.backend.dev
+    container_name: cese-backend-dev
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    environment:
+      - GO_ENV=development
+      - CESE_DATABASE_HOST=mysql
+      - CESE_DATABASE_PORT=3306
+      - CESE_DATABASE_USERNAME=root
+      - CESE_DATABASE_PASSWORD=123456
+      - CESE_DATABASE_DATABASE=cese_dev
+      - CESE_JWT_SECRET=cese-jwt-secret-key-development
+      - CESE_LOG_LEVEL=debug
+      - CESE_LOG_OUTPUT=console
+    volumes:
+      - ../backend:/app
+      - go_mod_cache:/go/pkg/mod
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - cese-network-dev
+
+volumes:
+  mysql_dev_data:
+    driver: local
+  redis_dev_data:
+    driver: local
+  go_mod_cache:
+    driver: local
+
+networks:
+  cese-network-dev:
+    driver: bridge

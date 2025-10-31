@@ -166,3 +166,35 @@ func (h *UserHandler) GetProfile(ctx context.Context, c *app.RequestContext) {
 
 	response.SuccessWithMessage(c, "获取成功", user)
 }
+
+// RefreshToken 刷新Token
+// @Summary 刷新Token
+// @Description 使用刷新Token获取新的访问Token
+// @Tags 用户管理
+// @Accept json
+// @Produce json
+// @Param request body model.RefreshTokenRequest true "刷新Token请求"
+// @Success 200 {object} response.Response{data=model.RefreshTokenResponse} "刷新成功"
+// @Failure 400 {object} response.Response "参数错误"
+// @Failure 401 {object} response.Response "Token无效"
+// @Router /api/v1/user/refresh [post]
+func (h *UserHandler) RefreshToken(ctx context.Context, c *app.RequestContext) {
+	var req model.RefreshTokenRequest
+	if err := c.BindAndValidate(&req); err != nil {
+		response.ErrorWithMessage(c, response.CodeInvalidParams, "参数绑定失败: "+err.Error())
+		return
+	}
+
+	refreshResp, err := h.userService.RefreshToken(&req)
+	if err != nil {
+		switch err.Error() {
+		case "刷新Token失败":
+			response.Error(c, response.CodeInvalidToken)
+		default:
+			response.ErrorWithMessage(c, response.CodeInternalError, err.Error())
+		}
+		return
+	}
+
+	response.SuccessWithMessage(c, "Token刷新成功", refreshResp)
+}

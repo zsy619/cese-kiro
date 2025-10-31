@@ -91,6 +91,17 @@ func (u *User) ToResponse() *UserResponse {
 
 // LoginResponse 登录响应
 type LoginResponse struct {
-	Token string        `json:"token"`
-	User  *UserResponse `json:"user"`
+	AccessToken  string        `json:"access_token"`
+	RefreshToken string        `json:"refresh_token"`
+	User         *UserResponse `json:"user"`
+}
+
+// RefreshTokenRequest 刷新Token请求
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token" binding:"required" validate:"required"`
+}
+
+// RefreshTokenResponse 刷新Token响应
+type RefreshTokenResponse struct {
+	AccessToken string `json:"access_token"`
 }

@@ -14,6 +14,7 @@ import (
 type UserService interface {
 	Register(req *model.UserRegisterRequest) (*model.UserResponse, error)
 	Login(req *model.UserLoginRequest) (*model.LoginResponse, error)
+	RefreshToken(req *model.RefreshTokenRequest) (*model.RefreshTokenResponse, error)
 	ChangePassword(userID uint64, req *model.UserChangePasswordRequest) error
 	GetProfile(userID uint64) (*model.UserResponse, error)
 }
@@ -34,11 +35,6 @@ func NewUserService(userRepo repository.UserRepository, cfg *config.Config) User
 
 // Register 用户注册
 func (s *userService) Register(req *model.UserRegisterRequest) (*model.UserResponse, error) {
-	// 参数验证
-	if err := validator.ValidateStruct(req); err != nil {
-		return nil, errors.New("参数验证失败")
-	}
-
 	// 手机号格式验证
 	if !validator.IsValidPhone(req.Phone) {
 		return nil, errors.New("手机号格式错误")
@@ -47,6 +43,11 @@ func (s *userService) Register(req *model.UserRegisterRequest) (*model.UserRespo
 	// 密码强度验证
 	if !validator.IsStrongPassword(req.Password) {
 		return nil, errors.New("密码强度不够")
+	}
+
+	// 参数验证
+	if err := validator.ValidateStruct(req); err != nil {
+		return nil, errors.New("参数验证失败")
 	}
 
 	// 检查用户是否已存在
@@ -97,33 +98,35 @@ func (s *userService) Login(req *model.UserLoginRequest) (*model.LoginResponse, 
 		return nil, errors.New("密码错误")
 	}
 
-	// 生成JWT Token
-	token, err := utils.GenerateToken(
+	// 生成JWT Token对
+	accessToken, refreshToken, err := utils.GenerateTokenPair(
 		user.ID,
 		user.Phone,
 		s.config.JWT.Secret,
 		s.config.GetJWTExpireDuration(),
+		s.config.GetRefreshExpireDuration(),
 	)
 	if err != nil {
 		return nil, errors.New("生成Token失败")
 	}
 
 	return &model.LoginResponse{
-		Token: token,
-		User:  user.ToResponse(),
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		User:         user.ToResponse(),
 	}, nil
 }
 
 // ChangePassword 修改密码
 func (s *userService) ChangePassword(userID uint64, req *model.UserChangePasswordRequest) error {
-	// 参数验证
-	if err := validator.ValidateStruct(req); err != nil {
-		return errors.New("参数验证失败")
-	}
-
 	// 新密码强度验证
 	if !validator.IsStrongPassword(req.NewPassword) {
 		return errors.New("新密码强度不够")
+	}
+
+	// 参数验证
+	if err := validator.ValidateStruct(req); err != nil {
+		return errors.New("参数验证失败")
 	}
 
 	// 查找用户
@@ -165,4 +168,26 @@ func (s *userService) GetProfile(userID uint64) (*model.UserResponse, error) {
 	}
 
 	return user.ToResponse(), nil
+}
+
+// RefreshToken 刷新访问Token
+func (s *userService) RefreshToken(req *model.RefreshTokenRequest) (*model.RefreshTokenResponse, error) {
+	// 参数验证
+	if err := validator.ValidateStruct(req); err != nil {
+		return nil, errors.New("参数验证失败")
+	}
+
+	// 生成新的访问Token
+	newAccessToken, err := utils.RefreshAccessToken(
+		req.RefreshToken,
+		s.config.JWT.Secret,
+		s.config.GetJWTExpireDuration(),
+	)
+	if err != nil {
+		return nil, errors.New("刷新Token失败")
+	}
+
+	return &model.RefreshTokenResponse{
+		AccessToken: newAccessToken,
+	}, nil
 }

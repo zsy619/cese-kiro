@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: cese-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: cese
+      MYSQL_USER: cese_user
+      MYSQL_PASSWORD: cese_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - cese-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Redis 缓存
+  redis:
+    image: redis:7-alpine
+    container_name: cese-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - cese-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 10s
+      retries: 5
+
+  # CESE 全栈应用（前端 + 后端）
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: cese-app
+    restart: unless-stopped
+    ports:
+      - "3100:80"    # 前端端口
+      - "8080:8080"  # 后端端口
+    environment:
+      - NODE_ENV=production
+      - REACT_APP_API_BASE_URL=/api
+      - CESE_DATABASE_HOST=mysql
+      - CESE_DATABASE_PORT=3306
+      - CESE_DATABASE_USERNAME=root
+      - CESE_DATABASE_PASSWORD=123456
+      - CESE_DATABASE_DATABASE=cese
+      - CESE_JWT_SECRET=cese-jwt-secret-key-production
+      - CESE_LOG_LEVEL=info
+      - CESE_LOG_OUTPUT=file
+    volumes:
+      - ../backend/configs:/root/configs
+      - app_logs:/root/logs
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - cese-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  app_logs:
+    driver: local
+
+networks:
+  cese-network:
+    driver: bridge

@@ -4,6 +4,7 @@ import (
 	"cese-backend/internal/config"
 	"cese-backend/internal/middleware"
 	"cese-backend/internal/service"
+	"context"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -23,6 +24,7 @@ func SetupRoutes(
 	// 添加全局中间件
 	h.Use(middleware.ErrorLoggerMiddleware())
 	h.Use(middleware.LoggerMiddleware())
+	h.Use(middleware.RateLimitMiddleware(cfg))
 
 	// API路由组
 	api := h.Group("/api")
@@ -33,6 +35,7 @@ func SetupRoutes(
 	{
 		userGroup.POST("/register", userHandler.Register)
 		userGroup.POST("/login", userHandler.Login)
+		userGroup.POST("/refresh", userHandler.RefreshToken)
 	}
 
 	// 需要认证的用户路由
@@ -55,7 +58,7 @@ func SetupRoutes(
 	}
 
 	// 健康检查路由
-	h.GET("/health", func(c *app.RequestContext) {
+	h.GET("/health", func(ctx context.Context, c *app.RequestContext) {
 		c.JSON(200, map[string]interface{}{
 			"status":  "ok",
 			"message": "CESE Backend Service is running",
@@ -63,7 +66,7 @@ func SetupRoutes(
 	})
 
 	// 根路径
-	h.GET("/", func(c *app.RequestContext) {
+	h.GET("/", func(ctx context.Context, c *app.RequestContext) {
 		c.JSON(200, map[string]interface{}{
 			"name":    "CESE Backend API",
 			"version": "1.0.0",
