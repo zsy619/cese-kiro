@@ -1,0 +1,53 @@
+# CESE 后端服务配置文件示例
+# 复制此文件为 config.yaml 并修改相应配置
+
+# 服务配置
+server:
+  host: "0.0.0.0"
+  port: 8080
+  mode: "debug" # debug, release
+
+# 数据库配置
+database:
+  host: "localhost"
+  port: 3306
+  username: "your_username"
+  password: "your_password"
+  database: "cese"
+  charset: "utf8mb4"
+  parse_time: true
+  loc: "Local"
+  max_idle_conns: 10
+  max_open_conns: 100
+  conn_max_lifetime: 3600 # 秒
+
+# JWT配置
+jwt:
+  secret: "your-jwt-secret-key"
+  expire_hours: 24 # Token过期时间（小时）
+
+# 日志配置
+log:
+  level: "info" # debug, info, warn, error
+  format: "json" # json, text
+  output: "stdout" # stdout, file
+  file_path: "logs/app.log"
+  max_size: 100 # MB
+  max_backups: 3
+  max_age: 28 # 天
+  compress: true
+
+# 分页配置
+pagination:
+  default_page: 1
+  default_size: 15
+  max_size: 100
+
+# 密码配置
+password:
+  min_length: 8
+  max_length: 16
+  require_number: true
+  require_lower: true
+  require_upper: true
+  require_special: true
